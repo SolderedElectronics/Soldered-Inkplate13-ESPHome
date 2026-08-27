@@ -33,6 +33,10 @@ class Inkplate5 : public InkplateParallelBase {
   static constexpr size_t CLEAN_SEQ_LEN = 8;
 
   bool do_board_transfer_step() override;
+
+  // Inkplate5V2's panel wiring needs per-row column reversal (row order preserved),
+  // unlike every other board's whole-buffer reversal. See InkplateParallelBase.
+  bool per_row_column_flip_() const override { return true; }
 };
 
 class Inkplate5V1 : public Inkplate5 {
@@ -48,6 +52,9 @@ class Inkplate5V1 : public Inkplate5 {
  protected:
   static const CleanStep CLEAN_SEQ_V1[9];
   static constexpr size_t CLEAN_SEQ_V1_LEN = 9;
+
+  // V1 uses the standard whole-buffer reversal, unlike V2 — undo the parent override.
+  bool per_row_column_flip_() const override { return false; }
 };
 
 }  // namespace esphome::inkplate

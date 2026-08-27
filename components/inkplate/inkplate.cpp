@@ -761,9 +761,13 @@ bool InkplateParallelBase::do_transfer_step() {
 bool InkplateParallelBase::do_board_transfer_step() {
   switch (this->trf_sub_) {
     case TRF_DARK: {
+      const bool per_row = this->per_row_column_flip_();
       const uint8_t *dmp = this->d_memory_new_ + (size_t) this->width_ * this->height_ / 8 - 1;
+      const uint8_t *row_ptr = this->d_memory_new_;
       vscan_start_();
       for (int i = 0; i < this->height_; i++) {
+        if (per_row)
+          dmp = row_ptr + this->width_ / 8 - 1;
         for (int n = 0; n < this->width_ / 4; n += 4) {
           uint8_t dram1 = *dmp;
           uint8_t dram2 = *(dmp - 1);
@@ -773,6 +777,8 @@ bool InkplateParallelBase::do_board_transfer_step() {
           this->dma_line_buf_[n + 3] = INKPLATE_LUTB[dram1 & 0x0F];
           dmp -= 2;
         }
+        if (per_row)
+          row_ptr += this->width_ / 8;
         send_line_i2s_();
         vscan_end_();
       }
@@ -784,9 +790,13 @@ bool InkplateParallelBase::do_board_transfer_step() {
     }
 
     case TRF_LUT2: {
+      const bool per_row = this->per_row_column_flip_();
       const uint8_t *dmp = this->d_memory_new_ + (size_t) this->width_ * this->height_ / 8 - 1;
+      const uint8_t *row_ptr = this->d_memory_new_;
       vscan_start_();
       for (int i = 0; i < this->height_; i++) {
+        if (per_row)
+          dmp = row_ptr + this->width_ / 8 - 1;
         for (int n = 0; n < this->width_ / 4; n += 4) {
           uint8_t dram1 = *dmp;
           uint8_t dram2 = *(dmp - 1);
@@ -796,6 +806,8 @@ bool InkplateParallelBase::do_board_transfer_step() {
           this->dma_line_buf_[n + 3] = INKPLATE_LUT2[dram1 & 0x0F];
           dmp -= 2;
         }
+        if (per_row)
+          row_ptr += this->width_ / 8;
         send_line_i2s_();
         vscan_end_();
       }
@@ -817,15 +829,21 @@ bool InkplateParallelBase::do_board_transfer_step() {
     }
 
     case TRF_PARTIAL_SEND: {
+      const bool per_row = this->per_row_column_flip_();
       const uint8_t *pb = this->p_buffer_ + (size_t) this->width_ * this->height_ / 4 - 1;
+      const uint8_t *row_ptr = this->p_buffer_;
       vscan_start_();
       for (int i = 0; i < this->height_; i++) {
+        if (per_row)
+          pb = row_ptr + this->width_ / 4 - 1;
         for (int j = 0; j < this->width_ / 4; j += 4) {
           this->dma_line_buf_[j + 2] = *pb--;
           this->dma_line_buf_[j + 3] = *pb--;
           this->dma_line_buf_[j] = *pb--;
           this->dma_line_buf_[j + 1] = *pb--;
         }
+        if (per_row)
+          row_ptr += this->width_ / 4;
         send_line_i2s_();
         vscan_end_();
       }
@@ -852,9 +870,13 @@ bool InkplateParallelBase::do_board_transfer_step() {
     }
 
     case TRF_GRAYSCALE_SEND: {
+      const bool per_row = this->per_row_column_flip_();
       const uint8_t *dp = this->d_memory_4bit_ + (size_t) this->width_ * this->height_ / 2;
+      const uint8_t *row_ptr = this->d_memory_4bit_;
       vscan_start_();
       for (int i = 0; i < this->height_; i++) {
+        if (per_row)
+          dp = row_ptr + this->width_ / 2;
         for (int j = 0; j < this->width_ / 4; j += 4) {
           uint8_t pix_hi, pix_lo;
           pix_hi = *(--dp);
@@ -874,6 +896,8 @@ bool InkplateParallelBase::do_board_transfer_step() {
           this->dma_line_buf_[j + 1] =
               (uint8_t) (this->glut2_[this->trf_k_ * 256 + pix_hi] | this->glut_[this->trf_k_ * 256 + pix_lo]);
         }
+        if (per_row)
+          row_ptr += this->width_ / 2;
         send_line_i2s_();
         vscan_end_();
       }

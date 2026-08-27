@@ -157,6 +157,13 @@ class InkplateParallelBase : public display::DisplayBuffer, public i2c::I2CDevic
   // implementation; boards override only for quirks (remainder bytes, alternate sequencing).
   virtual bool do_board_transfer_step();
 
+  // Column send order for TRF_DARK/TRF_LUT2/TRF_PARTIAL_SEND/TRF_GRAYSCALE_SEND.
+  // false (default): whole framebuffer read back-to-front as one continuous run —
+  //   row order reversed along with columns, matches every board except Inkplate5V2.
+  // true: per-row only — pointer resets to the row's last byte each line, row order
+  //   preserved (Inkplate5V2's panel wiring needs this; overridden true there only).
+  virtual bool per_row_column_flip_() const { return false; }
+
   // TPS65186 power-down + I2S clock/GPIO release.
   // Called every loop() tick in STATE_POWER_OFF; return true when done.
   bool do_power_off_step_();
