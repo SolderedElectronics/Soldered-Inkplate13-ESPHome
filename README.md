@@ -7,7 +7,7 @@ ESPHome external component for Inkplate e-paper displays.
 
 ## Supported boards
 
-### Parallel (non-SPI) — `inkplate` component
+### Parallel (non-SPI) - `inkplate` component
 
 | Model | Resolution | Colors | Partial update | Grayscale | MCU |
 |-------|-----------|--------|----------------|-----------|-----|
@@ -20,7 +20,7 @@ ESPHome external component for Inkplate e-paper displays.
 | Inkplate 4 | 600 × 600 | Black / White | Yes | 8 levels | ESP32 |
 | Inkplate 10 | 1200 × 825 | Black / White | Yes | 8 levels | ESP32 |
 
-### SPI — `inkplate_spi` component
+### SPI - `inkplate_spi` component
 
 | Model | Resolution | Colors | Partial update | MCU | PSRAM |
 |-------|-----------|--------|----------------|-----|-------|
@@ -29,7 +29,7 @@ ESPHome external component for Inkplate e-paper displays.
 | Inkplate 2 | 104 × 212 | Black / White / Red | No | ESP32 | Quad, 40 MHz |
 
 > [!WARNING]
-> PSRAM is required on all boards — framebuffers are too large for internal RAM.
+> PSRAM is required on all boards - framebuffers are too large for internal RAM.
 
 ---
 
@@ -89,7 +89,7 @@ display:
     it.print(400, 300, id(my_font), COLOR_ON, display::TextAlign::CENTER, "Hello!");
 ```
 
-The `on_boot` trigger is needed because the display does not draw automatically on startup — `component.update` kicks off the first refresh after all components have initialised.
+The `on_boot` trigger is needed because the display does not draw automatically on startup - `component.update` kicks off the first refresh after all components have initialised.
 
 #### Grayscale mode
 
@@ -106,7 +106,7 @@ display:
 
 #### Partial update
 
-Partial update refreshes only changed pixels — much faster than a full refresh but can accumulate ghosting over time. A full update clears ghosting.
+Partial update refreshes only changed pixels - much faster than a full refresh but can accumulate ghosting over time. A full update clears ghosting.
 
 ```cpp
 // inside a lambda or interval action
@@ -117,20 +117,20 @@ if (!id(my_display).is_refreshing()) {
 ```
 
 > [!NOTE]
-> The first update after boot is always a full refresh — partial is blocked until a full update establishes a known panel state.
+> The first update after boot is always a full refresh - partial is blocked until a full update establishes a known panel state.
 
 #### Configuration options
 
 | Key | Required | Default | Description |
 |-----|----------|---------|-------------|
-| `model` | yes | — | Board model (see table above) |
-| `pca6416a_id` | yes | — | ID of the PCAL6416A expander component |
+| `model` | yes | - | Board model (see table above) |
+| `pca6416a_id` | yes | - | ID of the PCAL6416A expander component |
 | `address` | no | `0x48` | TPS65186 PMIC I2C address |
-| `update_interval` | no | — | How often to trigger a full refresh |
+| `update_interval` | no | - | How often to trigger a full refresh |
 | `full_update_every` | no | `1` | Force full refresh every N updates |
 | `grayscale_mode` | no | `false` | Enable 8-level grayscale drawing |
 | `rotation` | no | `0°` | Display rotation (0 / 90 / 180 / 270) |
-| `lambda` | no | — | Drawing lambda |
+| `lambda` | no | - | Drawing lambda |
 
 ---
 
@@ -145,8 +145,8 @@ esphome:
       - component.update: my_display
 
 spi:
-  clk_pin: GPIOX
-  mosi_pin: GPIOX    # MISO not needed — display is write-only
+  clk_pin: GPIOX     # GPIO38 for 13SPECTRA, GPIO18 for 6COLOR and 2
+  mosi_pin: GPIOX    # GPIO40 for 13SPECTRA, GPIO23 for 6COLOR and 2
 
 display:
   platform: inkplate_spi
@@ -160,7 +160,7 @@ display:
 
 `update_interval: never` is recommended for battery-powered use and for ACeP panels where refresh rate must be controlled. Use a `time` component or `interval:` block to trigger updates instead.
 
-#### Inkplate 13 — partial update
+#### Inkplate 13 - partial update
 
 Inkplate 13 supports refreshing a subregion without a full-panel redraw:
 
@@ -177,11 +177,11 @@ if (!id(my_display).is_busy()) {
 
 | Key | Required | Default | Description |
 |-----|----------|---------|-------------|
-| `model` | yes | — | Board model (see table above) |
-| `update_interval` | no | — | How often to trigger a full refresh |
+| `model` | yes | - | Board model (see table above) |
+| `update_interval` | no | - | How often to trigger a full refresh |
 | `full_update_every` | no | `1` | Trigger full refresh every N updates |
 | `rotation` | no | `0°` | Display rotation (0 / 90 / 180 / 270) |
-| `lambda` | no | — | Drawing lambda |
+| `lambda` | no | - | Drawing lambda |
 
 Pin defaults match stock Inkplate hardware. Override any pin by adding e.g. `pin_rst: GPIO4` to the display block.
 
