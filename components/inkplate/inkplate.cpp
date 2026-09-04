@@ -90,6 +90,7 @@ void InkplateParallelBase::update() {
   }
   this->do_update_();
   this->update_count_++;
+  this->at_update_ = 0;
   this->partial_ = false;
   ESP_LOGD(TAG, "update #%d", this->update_count_);
   this->prepare_for_update_();
@@ -155,12 +156,19 @@ void InkplateParallelBase::display_partial() {
   if (this->block_partial_) {
     ESP_LOGW(TAG, "display_partial() → forced full (no prior full update)");
     this->partial_ = false;
+    this->at_update_ = 0;
     this->prepare_for_update_();
     this->enable_loop();
     this->set_state_(STATE_POWER_ON);
     return;
   }
-  this->partial_ = true;
+  if (this->full_update_every_ > 1 && ++this->at_update_ >= this->full_update_every_) {
+    ESP_LOGD(TAG, "display_partial() → full update (full_update_every=%d)", this->full_update_every_);
+    this->at_update_ = 0;
+    this->partial_ = false;
+  } else {
+    this->partial_ = true;
+  }
   this->prepare_for_update_();
   this->enable_loop();
   this->set_state_(STATE_POWER_ON);

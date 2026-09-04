@@ -212,6 +212,7 @@ class InkplateParallelBase : public display::DisplayBuffer, public i2c::I2CDevic
   bool gpio0_enable_low_{false};
 
   int full_update_every_{1};
+  int at_update_{0};
   int update_count_{0};
   bool partial_{false};
   bool grayscale_mode_{false};
